@@ -1,18 +1,17 @@
 
 
 
-# 🧟‍♂️ Curug Watcher: Person Counter in a Haunted Waterfall
+# 🧟‍♂️ Mbaurekso Curug: Person Counter in a Haunted Waterfall
 
 > “Di balik gemuruh air yang jatuh… ada sesuatu yang juga sedang mengamati.”  
 > Aplikasi ini memantau keberadaan manusia di area wisata Curug—tetapi sekarang bergaya horror.  
-> Di atas feed kamera, kamu bisa menambahkan sosok `Genderuwo` sebagai overlay (misal untuk hiburan / event malam).  
 
 ![download](https://github.com/user-attachments/assets/3be16855-9cf7-4fb3-8081-835dfae1f271)
 ---
 
 ## 🩸 Konsep Singkat
 
-Curug Watcher menghitung jumlah orang (occupancy) yang berada di dalam Area of Interest (AOI) sebuah area curug (air terjun).  
+Mbaurekso Curug menghitung jumlah orang (occupancy) yang berada di dalam Area of Interest (AOI) sebuah area curug (air terjun).  
 Tidak ada tracking unik—hanya hitungan langsung per frame (siapa yang tertangkap di area).  
 Sistem dapat memberikan “ALERT” ketika area mulai dihuni... atau tiba-tiba kosong—seolah ada sesuatu yang membuat mereka menghilang.
 
@@ -247,21 +246,9 @@ Jika butuh semua itu → harus aktifkan kembali tracking.
 
 ---
 
-## 📝 Lisensi
-
-Tambahkan LICENSE (disarankan MIT) bila akan dipublikasikan.
-
----
-
-## 🤝 Kontribusi
-
-PR: tambah efek horror, mode malam, atau integrasi sensor kabut?  
-Silakan kirim—“Semakin gelap, semakin hidup.”
-
----
 
 ## 🩶 Penutup
 
-> “Kalau counter menunjukkan 0 tapi kamu masih merasa ada yang berdiri di belakang… mungkin sistem belum sempat mendeteksi.”
+> “Kalau counter menunjukkan 0 tapi kamu masih merasa ada yang berdiri di belakang… mungkin sistem belum sempat mendeteksi. atau ....... iiii takutnyoooo”
 
 Selamat menjaga Curug. 🌫️
