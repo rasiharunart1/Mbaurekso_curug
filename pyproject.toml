@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=65.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "visitor-alert-system"
+version = "0.1.0"
+description = "Real-time visitor detection & alert system with MySQL logging"
+authors = [{name="Your Name", email="you@example.com"}]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "ultralytics>=8.3.0",
+    "opencv-python>=4.8.0",
+    "pillow>=10.0.0",
+    "pyautogui>=0.9.54",
+    "numpy>=1.23.0",
+    "mss>=7.0.1",
+    "torch>=2.2.0",
+    "torchvision>=0.17.0",
+    "pymysql>=1.1.0"
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "flake8", "mypy"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

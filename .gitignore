@@ -1,0 +1,25 @@
+# Env
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+
+# Settings runtime
+settings.json
+
+# Build
+build/
+dist/
+*.spec
+
+# IDE
+.vscode/
+.idea/

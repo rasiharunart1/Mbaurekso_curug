@@ -1,0 +1,15 @@
+ultralytics>=8.3.0
+opencv-python>=4.8.0
+pillow>=10.0.0
+pyautogui>=0.9.54
+numpy>=1.23.0
+mss>=7.0.1
+torch>=2.2.0
+torchvision>=0.17.0
+pymysql>=1.1.0
+
+[dev]
+pytest
+black
+flake8
+mypy

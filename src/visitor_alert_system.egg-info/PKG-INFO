@@ -1,0 +1,23 @@
+Metadata-Version: 2.4
+Name: visitor-alert-system
+Version: 0.1.0
+Summary: Real-time visitor detection & alert system with MySQL logging
+Author-email: Your Name <you@example.com>
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: ultralytics>=8.3.0
+Requires-Dist: opencv-python>=4.8.0
+Requires-Dist: pillow>=10.0.0
+Requires-Dist: pyautogui>=0.9.54
+Requires-Dist: numpy>=1.23.0
+Requires-Dist: mss>=7.0.1
+Requires-Dist: torch>=2.2.0
+Requires-Dist: torchvision>=0.17.0
+Requires-Dist: pymysql>=1.1.0
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Dynamic: license-file

@@ -1,0 +1,8 @@
+BG_MAIN = "#222831"
+BG_PANEL = "#2c313a"
+BG_HEADER = "#1f242b"
+FG_TEXT = "#eeeeee"
+ACCENT = "#00d4ff"
+FG_WARN = "#ffb347"
+FG_ERR = "#ff5f56"
+FG_OK = "#28a745"
