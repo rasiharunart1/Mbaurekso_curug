@@ -1,134 +1,70 @@
 
+
+
+# 🧟‍♂️ Curug Watcher: Person Counter in a Haunted Waterfall
+
+> “Di balik gemuruh air yang jatuh… ada sesuatu yang juga sedang mengamati.”  
+> Aplikasi ini memantau keberadaan manusia di area wisata Curug—tetapi sekarang bergaya horror.  
+> Di atas feed kamera, kamu bisa menambahkan sosok `Genderuwo` sebagai overlay (misal untuk hiburan / event malam).  
+
 ![download](https://github.com/user-attachments/assets/3be16855-9cf7-4fb3-8081-835dfae1f271)
+---
 
+## 🩸 Konsep Singkat
 
-# Person AOI Counter
-
-Sistem ringan untuk menghitung jumlah orang (class `person`) yang berada di dalam Area of Interest (AOI) pada sumber video (screen capture, webcam, atau stream).  
-Fokus: real-time occupancy (bukan tracking orang unik), toggle alert sederhana, dan penyimpanan snapshot manual ke MySQL.
+Curug Watcher menghitung jumlah orang (occupancy) yang berada di dalam Area of Interest (AOI) sebuah area curug (air terjun).  
+Tidak ada tracking unik—hanya hitungan langsung per frame (siapa yang tertangkap di area).  
+Sistem dapat memberikan “ALERT” ketika area mulai dihuni... atau tiba-tiba kosong—seolah ada sesuatu yang membuat mereka menghilang.
 
 ---
 
-## ✨ Fitur Utama
+## 👁️ Fitur Utama (Versi Horror)
 
-| Fitur | Deskripsi |
-|-------|-----------|
-| Deteksi Person | Menggunakan YOLO (Ultralytics) – hanya class `person` (COCO id=0) |
-| AOI Rectangle / Polygon | Hitung hanya bbox (titik tengah) yang berada di dalam AOI |
-| Occupancy Real-time | Jumlah orang yang terlihat dalam AOI pada frame saat ini |
-| Alert Toggle | Tombol ON/OFF – menulis log “AREA OCCUPIED” atau “AREA CLEAR” ketika status berubah |
-| Manual DB Store | Tombol “Store to DB” menyimpan `occupancy` + timestamp ke tabel `vas_person_counts` |
-| Screen / Webcam / Network | Sumber input fleksibel (desktop region, kamera USB, RTSP/HTTP stream) |
-| Tanpa Tracking | Sederhana & cepat; tidak ada perhitungan masuk/keluar atau unique visitors |
-| Konfigurasi Persisten | `settings.json` otomatis terbuat & disimpan setiap perubahan UI |
-| MySQL Opsional | Dapat dimatikan melalui konfigurasi |
-
----
-
-## 🧱 Arsitektur Sederhana
-
-```
-+------------------+
-|  Video Source    |  (Screen / Webcam / Network)
-+---------+--------+
-          |
-          v
-   Frame Capture
-          |
-          v
-   YOLO Inference (person only)
-          |
-          v
-  Filter by AOI  ---> Occupancy Count ---> Alert State (if enabled)
-          |
-   (Manual) Store to DB (snapshot)
-```
+| Fitur | Deskripsi Mencekam |
+|-------|--------------------|
+| Deteksi Person (YOLO) | Mendeteksi siluet manusia yang “berani” mendekat ke area curug |
+| AOI Rect / Polygon | Tandai batas area terlarang / “zona kabut” |
+| Real-time Occupancy | Tahu berapa jiwa yang sedang berada “dalam lingkaran” |
+| Alert Toggle | Nyala: sistem berbisik “AREA OCCUPIED” / “AREA CLEAR” hanya saat berubah |
+| Manual DB Store | Simpan snapshot jumlah jiwa ke database (MySQL) |
+| Screen / Webcam / Stream | Bisa pantau CCTV, rekaman sungai, atau RTSP hutan |
+| Tanpa Tracking | Ringan—tidak menguntit tiap individu… (yang menguntit mungkin yang lain) |
+| Gambar Genderuwo | Letakkan overlay PNG untuk efek gangguan supranatural |
 
 ---
 
-## 📂 Struktur Direktori (Model "src layout")
+## 🕯️ Arsitektur Gelap
 
 ```
-project_root/
-├─ pyproject.toml
-├─ requirements.txt
-├─ settings.json          # (otomatis dibuat saat runtime, bisa diedit manual)
-└─ src/
-   └─ vas/
-      ├─ __init__.py
-      ├─ main.py
-      ├─ config.py
-      ├─ detection.py
-      ├─ db_manager.py
-      └─ utils/
-         └─ screen_capture.py
-```
-
-> Jika ingin struktur sederhana tanpa `src/`, letakkan folder `vas/` langsung di root dan jalankan `python -m vas.main`.
-
----
-
-## 🛠️ Instalasi
-
-### 1. Siapkan Lingkungan Virtual
-
-Windows (CMD / PowerShell):
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-```
-
-Linux / macOS:
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### 2. Install Dependensi
-
-```bash
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-### 3. (Opsional) Editable Install
-
-Jika menggunakan `pyproject.toml` + layout `src/`:
-```bash
-pip install -e .
-```
-
-### 4. Download / Siapkan Weights YOLO
-
-Default memakai nama `yolov8n.pt`.  
-Jika belum ada, jalankan sekali (Ultralytics akan otomatis unduh):
-
-```bash
-python -c "from ultralytics import YOLO; YOLO('yolov8n.pt')"
-```
-
-Atau ganti `model_path` di `settings.json`.
-
----
-
-## ▶️ Menjalankan Aplikasi
-
-```bash
-python -m vas.main
-```
-
-Jika tidak pakai editable install + layout `src/`:
-```bash
-set PYTHONPATH=%CD%\src     # Windows
-export PYTHONPATH=$PWD/src  # Linux/macOS
-python -m vas.main
+[ Video Source ]
+      ↓
+ Screen / Cam / Stream
+      ↓
+YOLO Inference (person)
+      ↓
+Filter AOI (Rect / Polygon)
+      ↓
+ Instant Occupancy Count
+      ↓
+ Alert State (Occupied / Clear)
+      ↓
+ Manual DB Save (vas_person_counts)
 ```
 
 ---
 
-## ⚙️ Konfigurasi (settings.json)
+## 🧪 Teknologi Ritual
 
-Contoh (akan dibuat otomatis saat pertama kali jalan):
+- Python + Ultralytics YOLO
+- OpenCV
+- Tkinter GUI
+- MySQL (opsional logging)
+- MSS / PIL untuk screen capture
+- Tanpa pelacakan ID (agar roh berjalan bebas)
+
+---
+
+## ⚙️ Konfigurasi (settings.json Contoh)
 
 ```json
 {
@@ -174,15 +110,76 @@ Contoh (akan dibuat otomatis saat pertama kali jalan):
 
 ---
 
-## 🟥 Database (Opsional)
+## 🔧 Instalasi
 
-### Skema Tabel
+```bash
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# Linux/macOS
+source .venv/bin/activate
 
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+(Opsional, jika pakai layout `src/` + pyproject)
+```bash
+pip install -e .
+```
+
+Unduh model (sekali):
+```bash
+python -c "from ultralytics import YOLO; YOLO('yolov8n.pt')"
+```
+
+---
+
+## ▶️ Menjalankan
+
+```bash
+python -m vas.main
+```
+
+Jika tidak install editable:
+```bash
+set PYTHONPATH=%CD%\\src
+python -m vas.main
+```
+
+---
+
+## 🩻 Operasional GUI
+
+1. Pilih sumber input (Screen / Webcam / Network).
+2. Jika Screen → Select Region atau Full Screen.
+3. Bentuk AOI:  
+   - Rect: tombol “Set Rect” (klik & drag).  
+   - Polygon: “Draw Polygon” (klik titik-titik → klik kanan untuk selesai).
+4. Preview → cek.
+5. Start Counting.
+6. Toggle Alerts (ON = log saat status berubah).
+7. Store to DB → catat occupancy.
+8. Tambah overlay genderuwo di canvas (modifikasi di kode: setelah frame, sebelum tampil).
+
+---
+
+## 🧛 Mekanisme Alert
+
+| Keadaan | Pesan | Warna |
+|---------|-------|-------|
+| Awal ada orang | `AREA OCCUPIED (N)` | Merah |
+| Berubah jadi kosong | `AREA CLEAR` | Hijau |
+| Alert dimatikan | Tidak ada transisi baru | Abu-abu |
+
+> Tidak ada spam—hanya di-trigger saat perubahan status (makhluk masuk / keluar).
+
+---
+
+## 💾 Database (Opsional)
+
+Buat tabel:
 ```sql
-CREATE DATABASE IF NOT EXISTS vas_db
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE vas_db;
-
 CREATE TABLE IF NOT EXISTS vas_person_counts (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -191,106 +188,80 @@ CREATE TABLE IF NOT EXISTS vas_person_counts (
 ) ENGINE=InnoDB;
 ```
 
-### User Khusus (Disarankan)
-
-```sql
-CREATE USER 'vas_user'@'%' IDENTIFIED BY 'your_password_here';
-GRANT ALL PRIVILEGES ON vas_db.* TO 'vas_user'@'%';
-FLUSH PRIVILEGES;
+Set di `settings.json`:
+```json
+"database": { "enable": true, ... }
 ```
 
-### Menyimpan Snapshot
+---
 
-Klik tombol `Store to DB` → Insert satu baris (occupancy & note).
+## 👻 Menambahkan Overlay Genderuwo
+
+Letakkan file:
+```
+assets/images/genderuwo.png
+```
+
+Di dalam kode (misal di `main.py`, setelah frame diubah ke PIL Image):
+```python
+overlay = Image.open("assets/images/genderuwo.png").convert("RGBA")
+img_rgba = img.convert("RGBA")
+img_rgba.alpha_composite(overlay.resize((w_overlay, h_overlay)), (x_pos, y_pos))
+img = img_rgba.convert("RGB")
+```
 
 ---
 
-## 🖱️ Operasional UI
+## 🧟 Ide Pengembangan Lanjutan
 
-| Langkah | Aksi |
-|---------|------|
-| 1 | Pilih Input Source (screen / webcam / network) |
-| 2 | Jika screen: pilih region (Select Region / Full Screen) |
-| 3 | (Opsional) Tentukan AOI: Set Rect atau Draw Polygon |
-| 4 | Klik Preview (cek framing) |
-| 5 | Klik Start Counting |
-| 6 | Toggle Alerts (On/Off) sesuai kebutuhan |
-| 7 | Tekan Store to DB untuk menyimpan snapshot manual |
-| 8 | Clear AOI jika ingin ganti area |
+| Ide | Efek Horror |
+|-----|-------------|
+| Random hallucination overlay | Genderuwo muncul saat occupancy turun drastis |
+| Slow fade filter | Simulasikan kabut lembab di malam hari |
+| Auto snapshot interval | Simpan histori “keberadaan jiwa” |
+| Telegram Bot | Kirim pesan “Ada yang masuk area terlarang” |
+| Heatmap | Jejak intensitas kehadiran (energi spiritual?) |
+| Mode Night Inference | Adjust gamma / CLAHE sebelum deteksi |
 
 ---
 
-## 🔔 Mekanisme Alert
-
-| Kondisi | Log Ditulis | State Label |
-|---------|-------------|-------------|
-| Occupancy > 0 (berubah dari kosong) | `[HH:MM:SS] AREA OCCUPIED (N)` | OCCUPIED (Merah) |
-| Occupancy == 0 (berubah dari ada orang) | `[HH:MM:SS] AREA CLEAR` | CLEAR (Hijau) |
-| Alerts OFF | Tidak ada transisi baru | DISABLED (Abu-abu) |
-
----
-
-## 🚫 Keterbatasan (Tanpa Tracking)
+## ⚠️ Batasan
 
 | Hal | Status |
-|-----|--------|
-| Hitung unik orang | ❌ Tidak didukung |
-| Arah masuk / keluar | ❌ |
-| Dwell time (lama tinggal) | ❌ |
-| Filtering blur/small | ⚠️ Bisa tambahkan logika tambahan jika perlu |
-| Smoothing occupancy | ❌ (bisa ditambah moving average) |
+|-----|-------|
+| Unique person counting | ❌ |
+| Masuk / keluar jalur | ❌ |
+| Dwell time | ❌ |
+| Multi-AOI | ❌ (bisa ditambah list AOI) |
+| Anti duplikasi bounding noise | Partial (bisa tambah filtering ukuran) |
 
-Jika Anda membutuhkan hal-hal di atas → perlu integrasi tracker (ByteTrack / StrongSORT) dan state manajemen tambahan.
-
----
-
-## 🧪 Troubleshooting
-
-| Masalah | Penyebab Umum | Solusi |
-|---------|---------------|--------|
-| `ModuleNotFoundError: vas` | Belum install editable / PYTHONPATH belum diset | `pip install -e .` atau set PYTHONPATH |
-| FPS rendah | GPU tidak dipakai / model besar | Pakai `yolov8n.pt`, set `device` ke `cuda` |
-| Tidak ada bounding box | Model_path salah / threshold terlalu tinggi | Cek file model & turunkan `confidence_threshold` |
-| DB Store gagal | DB disabled / kredensial salah | Set `"enable": true` dan cek user/password |
-| AOI tidak terdeteksi | Lupa klik kanan untuk akhiri polygon | Selesaikan polygon (≥3 titik) |
+Jika butuh semua itu → harus aktifkan kembali tracking.
 
 ---
 
-## 🚀 Roadmap (Opsional)
+## 🕯️ Etika & Catatan
 
-| Prioritas | Fitur |
-|-----------|-------|
-| Medium | Smoothing occupancy (EMA / median) |
-| Medium | Auto snapshot interval ke DB |
-| High | Mode tracking untuk unique & dwell |
-| Low | Notifikasi Telegram (Webhook) |
-| Low | Ekspor CSV dari DB UI sederhana |
-| Low | Packaging PyInstaller |
+- Jangan gunakan untuk menakut-nakuti pengunjung tanpa izin.
+- Overlay mitologi (Genderuwo) bersifat hiburan / tema event.
+- Pastikan mematuhi privasi pengunjung (tidak menyimpan wajah).
 
 ---
 
-## 🔐 Keamanan
+## 📝 Lisensi
 
-- Jalankan hanya model terpercaya.
-- Jika network stream → pertimbangkan enkripsi (RTSP over TLS).
-- User DB terpisah dengan hak terbatas.
+Tambahkan LICENSE (disarankan MIT) bila akan dipublikasikan.
 
 ---
 
-## 🧾 Lisensi
+## 🤝 Kontribusi
 
-Silakan tentukan (MIT / Apache-2.0 / GPL-3.0).  
-Tambahkan file `LICENSE` bila dipublikasikan.
+PR: tambah efek horror, mode malam, atau integrasi sensor kabut?  
+Silakan kirim—“Semakin gelap, semakin hidup.”
 
 ---
 
-## 🙋 Dukungan / Pengembangan
+## 🩶 Penutup
 
-Butuh:
-- Tracking & dwell time?
-- Notifikasi otomatis?
-- Heatmap kepadatan?
+> “Kalau counter menunjukkan 0 tapi kamu masih merasa ada yang berdiri di belakang… mungkin sistem belum sempat mendeteksi.”
 
-Tinggal ajukan permintaan fitur berikutnya.
-
-Selamat menggunakan Person AOI Counter! 🎉
+Selamat menjaga Curug. 🌫️
