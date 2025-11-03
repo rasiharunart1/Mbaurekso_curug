@@ -9,7 +9,8 @@ DEFAULT_SETTINGS = {
         "confidence_threshold": 0.35,
         "iou_threshold": 0.50,
         "detection_confidence": 0.30,
-        "device": "auto"
+        "device": "cuda",
+        "use_half_precision": False 
     },
     "runtime": {
         "imgsz": 640,
@@ -30,7 +31,13 @@ DEFAULT_SETTINGS = {
         "polygon": []           # [[x,y],...]
     },
     "alerts": {
-        "enabled": True         # toggle dari UI
+        "enabled": True,                    # toggle dari UI
+        "sound_enabled": True,              # Enable sound alerts
+        "sound_type": "beep",               # beep | system | file
+        "sound_file": "",                   # Path to custom WAV file
+        "sound_continuous": True,           # NEW: Play continuously while occupied
+        "sound_interval": 5.0,              # NEW: Interval between sounds (seconds)
+        "sound_cooldown": 2.0               # Cooldown for single alerts
     },
     "database": {
         "enable": False,

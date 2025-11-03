@@ -1,90 +1,86 @@
-import time
-from typing import Dict, List, Any, Optional
+import json
+from pathlib import Path
 
-class AlertManager:
-    def __init__(self, cfg: dict, db=None):
-        self.cfg = cfg
-        self.db = db
-        self.last_fire: Dict[str, float] = {}
-        self.occupancy_history: List[tuple] = []
-        self.alerts: List[Dict[str, Any]] = []
-        self.keep_max = 120
+SETTINGS_FILE = Path("settings.json")
 
-    def _cooldown_ok(self, key: str) -> bool:
-        cd = self.cfg.get("cooldown_sec", 30)
-        now = time.time()
-        last = self.last_fire.get(key, 0)
-        if now - last >= cd:
-            self.last_fire[key] = now
-            return True
-        return False
+DEFAULT_SETTINGS = {
+    "model": {
+        "model_path": "vas//models/yolov8n.pt",
+        "confidence_threshold": 0.35,
+        "iou_threshold": 0.50,
+        "detection_confidence": 0.30,
+        "device": "cuda",
+        "use_half_precision": False 
+    },
+    "runtime": {
+        "imgsz": 640,
+        "use_half": True,
+        "detection_stride": 1,
+        "flush_frames": 2,
+        "use_mss_screen_capture": True
+    },
+    "input": {
+        "type": "screen",       # screen | webcam | network
+        "webcam_index": 0,
+        "stream_url": "",
+        "screen_region": None
+    },
+    "aoi": {
+        "mode": "rect",         # rect | poly
+        "rect": None,           # [x1,y1,x2,y2]
+        "polygon": []           # [[x,y],...]
+    },
+    "alerts": {
+        "enabled": True,        # toggle dari UI
+        "sound_enabled": True,  # NEW: Enable sound alerts
+        "sound_type": "beep",   # NEW: beep | system | file
+        "sound_file": "",       # NEW: Path to custom WAV file
+        "sound_cooldown": 2.0   # NEW: Seconds between sounds
+    },
+    "database": {
+        "enable": False,
+        "type": "mysql",
+        "host": "localhost",
+        "port": 3306,
+        "user": "vas_user",
+        "password": "your_password_here",
+        "name": "vas_db"
+    }
+}
 
-    def add_alert(self, atype: str, msg: str, occupancy: Optional[int] = None, meta: Optional[dict] = None):
-        a = {
-            "time": time.strftime("%H:%M:%S"),
-            "type": atype,
-            "message": msg,
-            "meta": meta or {},
-            "occupancy": occupancy
-        }
-        self.alerts.append(a)
-        if len(self.alerts) > self.keep_max:
-            self.alerts.pop(0)
-        if self.db:
+def deep_update(base, new):
+    for k,v in new.items():
+        if isinstance(v, dict) and k in base and isinstance(base[k], dict):
+            deep_update(base[k], v)
+        else:
+            base[k] = v
+
+class Settings:
+    def __init__(self):
+        self.data = json.loads(json.dumps(DEFAULT_SETTINGS))
+        self._load()
+    def _load(self):
+        if SETTINGS_FILE.exists():
             try:
-                self.db.insert_alert(atype, msg, occupancy, meta)
+                with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+                    disk = json.load(f)
+                deep_update(self.data, disk)
             except Exception:
                 pass
-        return a
+    def save(self):
+        try:
+            with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.data, f, indent=2)
+        except Exception:
+            pass
 
-    def record_occ(self, occ: int):
-        now = time.time()
-        self.occupancy_history.append((now, occ))
-        self.occupancy_history = [x for x in self.occupancy_history if now - x[0] <= 600]
+settings = Settings()
 
-    def check_capacity(self, occ: int):
-        cap = self.cfg.get("capacity_threshold", -1)
-        if cap > 0 and occ > cap and self._cooldown_ok("capacity"):
-            self.add_alert("CAPACITY", f"Occupancy {occ} > {cap}", occupancy=occ)
+MODEL_CONFIG = settings.data["model"]
+RUNTIME_CONFIG = settings.data["runtime"]
+INPUT_CONFIG = settings.data["input"]
+AOI_CONFIG = settings.data["aoi"]
+ALERT_CONFIG = settings.data["alerts"]
+DB_CONFIG = settings.data["database"]
 
-    def check_surge(self):
-        need = self.cfg.get("surge_count", 0)
-        interval = self.cfg.get("surge_interval_sec", 60)
-        if need <= 0 or not self.occupancy_history:
-            return
-        now = time.time()
-        current = self.occupancy_history[-1][1]
-        baseline = None
-        for t,o in reversed(self.occupancy_history):
-            if now - t >= interval:
-                baseline = o
-                break
-        if baseline is None:
-            return
-        delta = current - baseline
-        if delta >= need and self._cooldown_ok("surge"):
-            self.add_alert("SURGE", f"+{delta} in {interval}s", occupancy=current, meta={"delta": delta})
-
-    def check_dwell(self, tracks: dict):
-        th = self.cfg.get("dwell_time_sec", 0)
-        if th <= 0:
-            return
-        for tid,tr in tracks.items():
-            if tr["inside"] and tr["dwell_sec"] >= th:
-                key = f"dwell_{tid}"
-                if self._cooldown_ok(key):
-                    self.add_alert("DWELL", f"Track {tid} {tr['dwell_sec']}s >= {th}", meta={"track_id": tid})
-
-    def evaluate(self, occ: int, tracks: dict, summary: dict, snapshot_cb=None):
-        self.record_occ(occ)
-        self.check_capacity(occ)
-        self.check_surge()
-        self.check_dwell(tracks)
-        if snapshot_cb:
-            snapshot_cb(summary)
-
-    def recent(self, last_n=30):
-        return self.alerts[-last_n:]
-
-    def clear(self):
-        self.alerts.clear()
+CLASS_PERSON = 0

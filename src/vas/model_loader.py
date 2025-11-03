@@ -15,10 +15,20 @@ def load_model():
     m = YOLO(MODEL_CONFIG["model_path"])
     device = resolve_device()
     m.to(device)
-    if device.startswith("cuda") and RUNTIME_CONFIG.get("use_half", True):
-        try:
-            m.model.half()
-        except Exception:
-            pass
+    
+    # FIXED: Disable half precision to avoid dtype mismatch during fusion
+    # Comment out or remove the half precision conversion
+    # if device.startswith("cuda") and RUNTIME_CONFIG.get("use_half", True):
+    #     try:
+    #         m.model.half()
+    #     except Exception:
+    #         pass
+    
+    # Ensure model is in float32 for stability
+    try:
+        m.model.float()
+    except Exception:
+        pass
+    
     MODEL_CONFIG["device"] = device
     return m
