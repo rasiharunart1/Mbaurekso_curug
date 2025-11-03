@@ -1,0 +1,51 @@
+# Create/update .gitignore
+echo "# Env
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+
+# Settings runtime
+settings.json
+
+# Build
+build/
+dist/
+*.spec
+
+# IDE
+.vscode/
+.idea/
+
+# Large files - exclude common large file types
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.mp3
+*.wav
+*.zip
+*.rar
+*.7z
+*.tar.gz
+*.exe
+*.msi
+*.dmg
+*.pkg
+*.deb
+*.iso
+*.img
+*.db
+*.sqlite
+*.pdf
+*.psd
+*.ai
+*.eps" > .gitignore
