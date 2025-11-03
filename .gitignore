@@ -48,4 +48,4 @@ dist/
 *.pdf
 *.psd
 *.ai
-*.eps" > .gitignore
+*.eps" > .gitignore*.pt 
